@@ -2,14 +2,14 @@ const LEFT = [
   {
     src: './shots/console.png',
     alt: '商家台：两笔已支付订单、核销码与统计',
-    step: '01 / 商家台',
+    step: '商家台',
     caption: '¥10.39 · 2 单已付 · 1 次已核销 · 2 个在用码',
     ratio: '1440 / 1416',
   },
   {
     src: './shots/code.png',
     alt: '订单卡片：二维码、核销码与剩余次数',
-    step: '03 / 出码',
+    step: '出码',
     caption: '码 YY83-VKGF · 100 次 · 到期 2027/2/7',
     ratio: '1032 / 189',
   },
@@ -19,21 +19,21 @@ const RIGHT = [
   {
     src: './shots/checkout.png',
     alt: '演示收银台：标准对话 100 次，¥9.90',
-    step: '02 / 收银台',
+    step: '收银台',
     caption: 'mock 收银台 · 订单 ¥9.90 · 付款后自动出码',
     ratio: '560 / 439',
   },
   {
     src: './shots/label.png',
     alt: '58mm 外卖单标签：单号、二维码与到期日',
-    step: '04 / 单码',
+    step: '单码',
     caption: '单号 A20261109001 → RPGC-FKN4 · 58mm 标签',
     ratio: '438 / 302',
   },
   {
     src: './shots/scan.png',
     alt: '顾客扫码页：提问后剩余次数从 100 变 99',
-    step: '05 / 扫码',
+    step: '扫码',
     caption: '扫码一问一答，答完剩 99 / 100 次',
     ratio: '420 / 900',
   },
@@ -81,9 +81,8 @@ export default function LiveRun() {
           <div>
             <div className="section-num">06 / LIVE RUN</div>
             <h2 className="section-title mt-4">
-              真机跑通，
-              <br className="hidden sm:block" />
-              不是一张流程图。
+              <span className="block">真机跑通，</span>
+              <span className="block">不是一张流程图。</span>
             </h2>
           </div>
           <p className="lede max-w-[430px]">
