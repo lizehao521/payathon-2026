@@ -1,5 +1,5 @@
 /**
- * 一行体验模式（`relay demo`）：把「mock 上游 + 网关 + 看板 + 自检」压成一条命令。
+ * 一行体验模式（`relay demo`）：把「mock 上游 + 网关 + 看板 + 商家台 + 自检」压成一条命令。
  *
  * 存在的理由：首次接触这套东西的人不该先学五个命令、三个终端、四种环境变量。
  * demo 用一个进程承载全部角色，端口自动避让，任何可以立刻验证的行为都会打印出来。
@@ -12,7 +12,7 @@ import { MockUpstream } from './mock/upstream.js';
 import { createApp } from './app.js';
 import { memoryConfig } from './app.js';
 import { Logger } from './core/logger.js';
-import type { ProviderConfig, RelayConfig } from './core/types.js';
+import type { BusinessConfig, ProviderConfig, RelayConfig } from './core/types.js';
 import { createServer } from 'node:net';
 
 export interface DemoOptions {
@@ -31,6 +31,7 @@ export interface DemoInfo {
   url: string;
   mockUrl: string;
   adminUrl: string;
+  bizUrl: string;
   model: string;
   keys: { tier: string; key: string }[];
 }
@@ -38,6 +39,7 @@ export interface DemoInfo {
 const DEMO_MODELS = [
   'mock-small',
   'mock-large',
+  'mock-image',
   // 故障注入模型名：让"归因卡片长什么样"可以直接 curl 出来看
   'mock-429',
   'mock-503',
@@ -68,6 +70,23 @@ async function pickPort(start: number, host: string, tries = 20): Promise<number
   return 0; // 交给系统随机分配
 }
 
+/**
+ * 体验模式的商家台商品：mock 收银台，不需要任何商户资质。
+ * 价格是示例价，和 config/relay.example.yaml 保持同构，换配置即可上线。
+ */
+const DEMO_BUSINESS: BusinessConfig = {
+  enabled: true,
+  merchantName: '外卖 AI 商家',
+  sessionTtlHours: 12,
+  costCapRatio: 0.9,
+  packs: [
+    { id: 'chat-100', name: '标准对话 100 次', uses: 100, priceCny: 9.9, models: ['mock-small'], validDays: 90, description: '顾客扫码即用，含 AI 对话' },
+    { id: 'image-20', name: 'AI 画图 20 张', uses: 20, priceCny: 19.9, models: ['mock-image'], validDays: 90, description: '每张图计 1 次' },
+    { id: 'slip-5', name: '外卖单码（每单 5 次）', uses: 5, priceCny: 0.49, models: ['mock-small'], validDays: 30, description: '一单一个码，重复录入同一单号返回原码' },
+  ],
+  payments: { provider: 'mock' },
+};
+
 export function buildDemoConfig(opts: { mockUrl: string; port: number; host: string }): RelayConfig {
   const providers: ProviderConfig[] = [
     {
@@ -91,6 +110,7 @@ export function buildDemoConfig(opts: { mockUrl: string; port: number; host: str
       { id: 'demo-standard', label: '演示-标准层（归因走响应头）', key: 'sk-demo-standard', tier: 'standard', tenantId: 'demo', enabled: true },
       { id: 'demo-pro', label: '演示-Pro 层（归因+预检全开）', key: 'sk-demo-pro', tier: 'pro', tenantId: 'demo', enabled: true },
     ],
+    business: DEMO_BUSINESS,
     logLevel: 'warn',
   });
   config.server.host = opts.host;
@@ -129,6 +149,7 @@ export async function startDemo(opts: DemoOptions): Promise<{
     url: bound.url,
     mockUrl: mockBound.url,
     adminUrl: `${bound.url}/admin`,
+    bizUrl: `${bound.url}/biz`,
     model: 'mock-small',
     keys: [
       { tier: 'free', key: 'sk-demo-free' },
@@ -163,18 +184,22 @@ const yellow = (s: string): string => c('33', s);
 export function renderDemoBanner(info: DemoInfo): string {
   const L: string[] = [];
   L.push('');
-  L.push(bold('  api-relay 体验模式已启动') + dim('（mock 上游 + 网关 + 看板，全部在这个进程里）'));
+  L.push(bold('  api-relay 体验模式已启动') + dim('（mock 上游 + 网关 + 看板 + 商家台，全部在这个进程里）'));
   L.push('');
   L.push(`  ${bold('① 打开看板')}   ${cyan(info.adminUrl)}`);
   L.push(`     看"归因投递率""自动恢复""降损层开销"这些指标——它们回答的是同一个问题：`);
   L.push(dim('     降损层到底有没有在起作用。'));
   L.push('');
-  L.push(`  ${bold('② 发一个正常请求')}`);
+  L.push(`  ${bold('② 打开商家台')}   ${cyan(info.bizUrl)}`);
+  L.push(dim('     下单 → mock 收银台付款 → 出码 → 扫码即用 → 成功才扣次；'));
+  L.push(dim('     外卖单号重复录入返原码，58mm 标签页可直接打印。'));
+  L.push('');
+  L.push(`  ${bold('③ 发一个正常请求')}`);
   L.push(dim(`     curl -s ${info.url}/v1/chat/completions \\`));
   L.push(dim(`       -H 'authorization: Bearer sk-demo-pro' -H 'content-type: application/json' \\`));
   L.push(dim(`       -d '{"model":"mock-small","messages":[{"role":"user","content":"你好"}]}'`));
   L.push('');
-  L.push(`  ${bold('③ 看"错误对 Agent 可执行"是什么样')} ${dim('（把 model 换掉即可）')}`);
+  L.push(`  ${bold('④ 看"错误对 Agent 可执行"是什么样')} ${dim('（把 model 换掉即可）')}`);
   for (const [m, why] of [
     ['mock-429', '限流 → 建议等待 Xms 后重试（会自动重试一次）'],
     ['mock-balance', '余额不足 → 402 + top_up_balance，明确不让你重试'],
@@ -184,18 +209,18 @@ export function renderDemoBanner(info: DemoInfo): string {
     L.push(dim(`     model=${m.padEnd(14)} ${why}`));
   }
   L.push('');
-  L.push(`  ${bold('④ 看分层差异')} ${dim('（同一请求，三层三种行为）')}`);
+  L.push(`  ${bold('⑤ 看分层差异')} ${dim('（同一请求，三层三种行为）')}`);
   for (const k of info.keys) {
     L.push(dim(`     Bearer ${k.key.padEnd(18)} → ${k.tier} 层`));
   }
   L.push('');
-  L.push(`  ${bold('⑤ 验证"它没动我的数据"')}`);
+  L.push(`  ${bold('⑥ 验证"它没动我的数据"')}`);
   L.push(dim(`     请求头加 x-relay-verify-nonce: <随机串>，响应头会返回`));
   L.push(dim(`     x-relay-content-hmac——用同一个 nonce 重算即可自证字节未被篡改。`));
   L.push('');
   L.push(dim('  上游 mock 端口 ') + cyan(info.mockUrl) + dim('　按 Ctrl+C 退出'));
   L.push('');
-  L.push(`  ${bold('⑥ 管理面板能做什么')}`);
+  L.push(`  ${bold('⑦ 管理面板能做什么')}`);
   L.push(dim('     面板不只是看：新建/编辑/轮换/禁用客户 key、重置额度、摘除上游、'));
   L.push(dim('     以及热切换降损层开关（线上止损用）。每次写操作都进「配置与事件」页的事件流。'));
   L.push(dim('     明文 key 只在创建/轮换时显示一次——服务端只留 sha256，忘了就轮换。'));
@@ -222,6 +247,15 @@ export async function runSelfCheck(info: DemoInfo): Promise<{ name: string; ok: 
     out.push({ name: '健康检查', ok: health.status === 200, note: `HTTP ${health.status}` });
   } catch (err) {
     out.push({ name: '健康检查', ok: false, note: String(err) });
+  }
+
+  try {
+    const res = await fetch(info.bizUrl);
+    const html = await res.text();
+    const ok = res.status === 200 && html.includes('商家台');
+    out.push({ name: '商家台（/biz）', ok, note: ok ? '下单/出码/扫码在同进程内 ✓' : `HTTP ${res.status}` });
+  } catch (err) {
+    out.push({ name: '商家台（/biz）', ok: false, note: String(err) });
   }
 
   try {

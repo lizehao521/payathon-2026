@@ -184,7 +184,7 @@ export class BizService {
     const path = url.pathname.replace(/\/+$/, '') || '/';
 
     if (req.method === 'GET' && path === '/biz') {
-      this.html(res, 200, consoleHtml());
+      this.html(res, 200, consoleHtml(!this.opts.config.server.adminToken));
       return true;
     }
 

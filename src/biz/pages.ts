@@ -35,7 +35,14 @@ function shell(title: string, css: string, body: string, script: string): string
  * 商家控制台
  * ================================================================== */
 
-export function consoleHtml(): string {
+/**
+ * 商家台/管理台页面。
+ *
+ * autoEnter：未配置 adminToken 的本机体验模式下由服务端直接放行，
+ * 页面不必先让人面对一个「输入管理令牌」的登录框（这是首次体验最常见的卡点）。
+ * 生产配置了 adminToken 时仍走令牌流程。
+ */
+export function consoleHtml(autoEnter = false): string {
   const css = `
 .top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 0;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;white-space:nowrap}
@@ -119,6 +126,7 @@ export function consoleHtml(): string {
 const $=(s)=>document.querySelector(s);
 const esc=(s)=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let token=localStorage.getItem('biz_admin_token')||'';
+const AUTO_ENTER=${autoEnter ? 'true' : 'false'};
 const params=new URLSearchParams(location.search);
 const invite=params.get('t');
 if(invite){token=invite;localStorage.setItem('biz_admin_token',invite)}
@@ -251,7 +259,8 @@ $('#switchTok').onclick=()=>{localStorage.removeItem('biz_admin_token');token=''
 $('#saveTok').onclick=async()=>{token=$('#tok').value.trim();localStorage.setItem('biz_admin_token',token);try{await load()}catch(e){toast(e.message)}};
 $('#refresh').onclick=()=>load().catch(e=>toast(e.message));
 $('#slipNo').addEventListener('keydown',(e)=>{if(e.key==='Enter'){e.preventDefault();bindSlip().catch(err=>toast(err.message))}});
-if(token){$('#tok').value=token;load().catch(()=>{})}
+if(token)$('#tok').value=token;
+if(AUTO_ENTER||token)load().catch(()=>{});
 if(params.has('paid'))history.replaceState(null,'',location.pathname);
 `;
   return shell('外卖 AI · 商家台', css, body, script);

@@ -19,7 +19,7 @@ bash scripts/ops-check.sh          # 退出码 0 = 全部正常
 ```
 项目根/      ← 只放"人敲的门"
   start-net.sh      启停网关（start|stop|restart|status）
-  demo.sh           一行体验（mock 上游 + 网关，不需要密钥）
+  demo.sh           一行体验（mock 上游 + 网关 + 看板 + 商家台，不需要密钥）
 
 scripts/     ← 机器跑的 / 专项工具
   keepalive.sh     守护：健康检查驱动 + 每日备份 + 兜底隧道（cron @reboot 拉起）
