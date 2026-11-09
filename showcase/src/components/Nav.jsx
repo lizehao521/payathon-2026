@@ -7,6 +7,7 @@ const LINKS = [
   { id: 'payment', label: '402 链路' },
   { id: 'store', label: '门店闭环' },
   { id: 'buy', label: '购买次数' },
+  { id: 'live', label: '实机跑通' },
   { id: 'loss', label: '降损层' },
   { id: 'stack', label: '底座' },
 ];

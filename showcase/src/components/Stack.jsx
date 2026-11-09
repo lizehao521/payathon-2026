@@ -31,7 +31,7 @@ export default function Stack() {
       <div className="wrap">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div>
-            <div className="section-num">07 / THE BASEMENT</div>
+            <div className="section-num">08 / THE BASEMENT</div>
             <h2 className="section-title mt-4">
               零依赖不是洁癖，
               <br className="hidden sm:block" />

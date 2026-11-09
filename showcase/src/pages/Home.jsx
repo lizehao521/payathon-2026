@@ -5,6 +5,7 @@ import Tracks from '../components/Tracks.jsx';
 import PaymentDemo from '../components/PaymentDemo.jsx';
 import StoreLoop from '../components/StoreLoop.jsx';
 import BuyPack from '../components/BuyPack.jsx';
+import LiveRun from '../components/LiveRun.jsx';
 import LossLayer from '../components/LossLayer.jsx';
 import Stack from '../components/Stack.jsx';
 import Judging from '../components/Judging.jsx';
@@ -32,6 +33,7 @@ export default function Home() {
         <PaymentDemo />
         <StoreLoop />
         <BuyPack />
+        <LiveRun />
         <LossLayer />
         <Stack />
         <Judging />

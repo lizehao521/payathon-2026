@@ -25,7 +25,7 @@ export default function LossLayer() {
       <div className="wrap">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
           <div>
-            <div className="section-num">06 / LOSS CONTROL</div>
+            <div className="section-num">07 / LOSS CONTROL</div>
             <h2 className="section-title mt-4">
               省下来的，
               <br />

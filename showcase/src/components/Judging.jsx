@@ -33,7 +33,7 @@ export default function Judging() {
       <div className="wrap">
         <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           <div>
-            <div className="section-num">08 / SCORECARD</div>
+            <div className="section-num">09 / SCORECARD</div>
             <h2 className="section-title mt-4">
               按评分表，
               <br />
