@@ -1,0 +1,18 @@
+{
+  "requestId": "40f600dc-ae7c-4c2e-82aa-6712e3e055e3",
+  "publicId": "bnjgchnsjzztmfv9c",
+  "vibePay": {
+    "products": [
+      {
+        "requestId": "d596cb1f-1553-4d29-8b51-1080a2c77537",
+        "productName": "API Relay 调用次数包",
+        "billingMode": "QUANTITY",
+        "quotaUnit": "COUNT",
+        "outProductId": "wf_bd608d5c85be7f16d9785314117f21e066fce981c444c315",
+        "status": "enabled",
+        "boundToApp": true
+      }
+    ]
+  },
+  "runtimeEndpoint": "https://www.weavefox.cn"
+}
