@@ -5,6 +5,14 @@
 >
 > **它卖的不是 token，是"错误对 Agent 可执行"。** 成功响应逐字节透传，一点不碰。
 
+> **在线展示站（评委入口）**：<https://lizehao521.github.io/payathon-2026/>
+> **真实收款入口**：<https://bnjgchnsjzztmfv9c.app.weavefox.cn>
+>
+> 展示站里三块内容的性质不同，请勿混淆：
+> HTTP 402 握手演示 = mock 上游，**不扣款**；门店票据闭环 = 模拟数据，**不扣额度**；
+> 「购买次数包」= **真实 Vibe Pay 收款**（¥0.99 / 1 次），付款进入商家支付宝账户，到账次数按浏览器买家身份隔离。
+> 展示站源码在 [`showcase/`](./showcase)，构建产物在 [`docs/`](./docs)（GitHub Pages 直接发布）。
+
 | 项 | 值 |
 |---|---|
 | 运行时 | Node.js ≥ 22.5（用到 `node:sqlite`） |
